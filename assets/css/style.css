@@ -1,0 +1,60 @@
+@font-face {
+    font-family: oceanfont;
+    src: url(../images/oceanfont.ttf);
+}
+
+body {
+    text-align:center;
+    font-family: oceanfont;
+    background-image:url("../images/oceanbackground.jpg");
+    background-size:100%, 100%;
+    background-repeat: no-repeat;
+    letter-spacing:2px;
+
+}
+.answers{
+    color: #ffe0ab;
+    font-size:24px;
+}
+#answerstatus {
+    font-size:36px;
+}
+.answer1:hover, .answer2:hover, .answer3:hover, .correctAnswer:hover {
+    background-color: #608ab8;
+}
+.question {
+    margin-bottom: 40px;
+    font-size:36px;
+}
+
+#title {
+    height:100px;
+    margin-bottom:50px;
+    font-size: 120px;
+    vertical-align: middle;
+    color:#b5e5d3;
+}
+.jumbotron{
+    padding-top:0px;
+    padding-bottom:10px;
+    height:200px;
+}
+.well-lg {
+    background-color: #4bae88;
+    margin: 0px 400px 0px 400px;
+
+}
+button {
+    background-color:#ffe0ab;
+    font-size: 24px;
+}
+button:hover {
+    background-color: #608ab8;
+}
+#timeRem {
+    font-size: 24px;
+    text-align:center;     
+}
+#stats{
+    font-size:24px;
+}
