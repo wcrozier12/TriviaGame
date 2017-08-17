@@ -1,59 +1,58 @@
 $(document).ready(function(){
-
-
+$('#replay').hide();
 var correct = 0;
 var incorrect = 0;
 var unanswered = 0;
-var number = 30;
+var time = 10;
 var intervalId;
 var timeoutId;
-var showTime = function(){
-    $('#timeRem').html("Time Remaining: " + number);  
-};
-var hideTime = function (){
-    $('#timeRem').hide();
-}
-var clockRunning = false;
+var currentQuestion = 0;
 
 var questions = {
-    question1: {
+    1: {
         question: "question1",
         answer1: "answer",
         answer2: "answer",
-        correctAnswer: "answer",
-        answer4: "answer",  
+        correctAnswer: "canswer",
+        answer3: "answer",  
     },
-    question2:   {
+    2:   {
         question: "question2",
         answer1: "answer",
         answer2: "answer",
-        correctAnswer: "answer",
-        answer4: "answer",   
+        correctAnswer: "canswer",
+        answer3: "answer",   
     },
-    question3: {
+    3: {
         question: "question3",
         answer1: "answer",
         answer2: "answer",
         answer3: "answer",
-        correctAnswer: "answer",   
+        correctAnswer: "canswer",   
     },
-    question4: {
+    4: {
         question: "question4",
         answer1: "answer",
-        correctAnswer: "answer",
-        answer3: "answer",
-        answer4: "answer",   
+        correctAnswer: "canswer",
+        answer2: "answer",
+        answer3: "answer",   
     },
-    question5:  {
+    5:  {
         question: "question5",
         answer1: "answer",
         answer2: "answer",
         answer3: "answer",
-        correctAnswer: "answer",   
+        correctAnswer: "canswer",   
     }
 };
-
- 
+console.log(questions[4]);
+var numOfQ = Object.keys(questions).length; //number of questions
+var showTime = function(){
+    $('#timeRem').html("Time Remaining: " + time);  
+};  
+var hideTime = function (){
+    $('#timeRem').html('');
+}
 //inserts question into answers div
 function insertQuestion (question){
     for(var k in question) {
@@ -63,56 +62,116 @@ function insertQuestion (question){
         $('.answers').append(answer);
     }
 };
-
-
-function decrement() {
-    if (number===0){
-        displayStatus(questions.question1.correctAnswer, 'Out of Time' )
-        hideTime();
-        clockRunning = false;
-        timeoutId = setTimeout(run, 5000);
-
-        
-    }
-    else{
-    showTime();
-    number--;
-    }
-
+//displays the current question, and sets up currentQuestion var for next function call
+function displayQuestion() {
+    currentQuestion++;
+    insertQuestion(questions[currentQuestion])
 
 };
-
-
-
+//Begins thirty second timer
 function thirtySec(){
-    number = 30;
+    clearStatus();
+    time = 10;
     showTime();
     intervalId = setInterval(decrement, 1000);
     $('#start').hide();
-    clockRunning=true;
 };
 
+//When user runs out of time, correct answer appears, next question appears in five sec
+function decrement() {
+    if (time===0 && currentQuestion < numOfQ){
+        answerScreen();
+        displayStatus(questions[currentQuestion].correctAnswer, 'Out of Time' );
+        unanswered++;
+    }
+    else if (time > 0){
+    showTime();
+    time--;
+    }
+    else{
+      unanswered++;
+      displayStatus(questions[currentQuestion].correctAnswer, 'Out of Time' );
+      finalAnswer();
+
+    }
+};
+function fiveSec(){
+    timeoutId = setTimeout(run, 5000);
+}
+//displays or clears correct answer, and if the user got it right or if time was up
 function displayStatus(correctAnswer, status){
     $('#answerstatus').html(status);
-    $('#correctanswer').html(correctAnswer); //maybe image?
+    $('#correctanswer').html(correctAnswer); //maybe image?   
+    
+};
+function clearStatus () {
+    $('#answerstatus').html('');
+    $('#correctanswer').html('');
+}
+
+function userChoice(){
+    console.log(currentQuestion);
+    if($(this).hasClass('correctAnswer') && (currentQuestion < numOfQ)){
+      answerScreen();
+      displayStatus(questions[currentQuestion].correctAnswer, 'correct');
+      correct++;
+    }
+    else if (currentQuestion < numOfQ){
+      answerScreen();
+      displayStatus(questions[currentQuestion].correctAnswer, 'Incorrect');
+      incorrect++;
+    }
+    else if ($(this).hasClass('correctAnswer') && (currentQuestion == numOfQ)){
+      correct++;
+      finalAnswer();
+      displayStatus(questions[currentQuestion].correctAnswer, 'correct');
+    }
+    else if (currentQuestion == numOfQ) {
+      incorrect++;
+      finalAnswer();
+      displayStatus(questions[currentQuestion].correctAnswer, 'incorrect');
+    }
 };
 
+function answerScreen(){
+    clearInterval(intervalId);
+    hideTime();
+    fiveSec();
+};
 
-
+function finalAnswer(){
+    clearInterval(intervalId);
+    hideTime();
+    timeoutId = setTimeout(finalScreen(), 5000);
+}
+function finalScreen() {
+    clearInterval(intervalId);
+    hideTime();
+    $('.answers').html('');
+    $('#answerstatus').html('Game Over');
+    $('#stats').html("Correct: " + correct + " Incorrect: " +  incorrect + " Unanswered: " + unanswered);
+    $('#replay').show();
+    resetStats();
+}
 
 
 function run(){
-  for (var k in questions){
-      if (questions.hasOwnProperty(k) && clockRunning === false){
-        insertQuestion(questions[k]);
-        thirtySec();
-      }
-}
+    $('#stats').html('');
+    $('#replay').hide();
+    thirtySec();
+    displayQuestion();
+    $('.correctAnswer, .answer1, .answer2, .answer3').on('click', userChoice);
 };
 
+function resetStats(){
+    correct = 0;
+    incorrect = 0;
+    unanswered = 0;
+    currentQuestion = 0;
+}
 
-
+$('.correctAnswer').on('click', userChoice);
 $('#start').on("click", run);
-
+$('#replay').on('click', run);
 
 });
