@@ -1,7 +1,6 @@
 $(document).ready(function(){
 $('#replay').hide();
-
-
+//----------------------------------------------------------VARIABLES-----------------------------------------------------------------------
 var correct = 0;
 var incorrect = 0;
 var unanswered = 0;
@@ -83,6 +82,12 @@ var questions = {
     answer3: "4",  
 }
 };
+function insertImage (){
+  $('.answers').append('<img src="' + questions[currentQuestion].image + '/>');
+};
+var numOfQ = Object.keys(questions).length; //number of questions
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------STYLING----------------------------------------------------------------------------
 function lowTime(){
   if (time < 5) {
     $('#timeRem').css({"color":"red", 'font-size': '48px'});
@@ -91,36 +96,13 @@ function lowTime(){
     $('#timeRem').css({'color':'black', 'font-size':'36px'})
   }
 };
-
-var numOfQ = Object.keys(questions).length; //number of questions
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------TIMER FUNCTIONS-----------------------------------------------------------
 function showTime(){
   $('#timeRem').html("Time Remaining: " + time);  
 };  
 function hideTime(){
   $('#timeRem').html('');
-};
-function resetStats(){
-  correct = 0;
-  incorrect = 0;
-  unanswered = 0;
-  currentQuestion = 0;
-}; 
-//inserts current question and answers into answers div when called
-function insertQuestion (question){
-  for(var k in question) {
-    answer = $("<div>");
-    answer.addClass(k);
-    answer.html(question[k]);
-    $('.answers').append(answer);
-  }
-};
-function insertImage (){
-  $('.answers').append('<img src="' + questions[currentQuestion].image + '/>');
-};
-//displays the current question, and sets up currentQuestion var for next function call
-function displayQuestion() {
-  currentQuestion++;
-  insertQuestion(questions[currentQuestion])
 };
 //Begins thirty second timer
 function thirtySec(){
@@ -131,11 +113,15 @@ function thirtySec(){
   intervalId = setInterval(decrement, 1000);
   $('#start').hide();
 };
+//After the user guesses, starts 5 second timeout and then runs the next question
+function fiveSec(){
+  timeoutId = setTimeout(run, 5000);
+};
 //When user runs out of time, correct answer appears, next question appears in five sec
 function decrement() {
   if (time===0 && currentQuestion < numOfQ) { 
     answerScreen();
-    displayStatus(questions[currentQuestion].correctAnswer, 'Out of Time' );
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'Out of Time' );
     unanswered++;
   }
   else if (time > 0) {
@@ -145,29 +131,36 @@ function decrement() {
   }
   else { //if time runs out and it's the final question
     unanswered++;
-    displayStatus(questions[currentQuestion].correctAnswer, 'Out of Time' );
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'Out of Time' );
     finalAnswer();
   }
 };
-//After the user guesses, starts 5 second timeout and then runs the next question
-function fiveSec(){
-  timeoutId = setTimeout(run, 5000);
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------DISPLAY FUNCTIONS----------------------------------------------------------------
+//inserts current question and answers into answers div when called
+function insertQuestion (question){
+  for(var k in question) {
+    answer = $("<div>");
+    answer.addClass(k);
+    answer.html(question[k]);
+    $('.answers').append(answer);
+  }
+};
+//displays the current question, and sets up currentQuestion var for next function call
+function displayQuestion() {
+  currentQuestion++;
+  insertQuestion(questions[currentQuestion])
 };
 //displays or clears correct answer, and if the user got it right or if time was up
 function displayStatus(correctAnswer, status){
   $('#answerstatus').html(status);
   $('#correctanswer').html(correctAnswer); //maybe image?   
 };
-function clearStatus () {
-  $('#answerstatus').html('');
-  $('#correctanswer').html('');
-};
 //displays answer screen up until last question
 function answerScreen(){
   clearInterval(intervalId);
   hideTime();
   fiveSec();
-  insertImage();
 };
 //displays answer screen for last question, which leads to final/replay screen
 function finalAnswer() {
@@ -175,48 +168,63 @@ function finalAnswer() {
   hideTime();
   timeoutId = setTimeout(finalScreen(), 5000);
 }
+//final screen with stats for the game and replay button
 function finalScreen() {
   clearInterval(intervalId);
   hideTime();
+  endReset();
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------RESET/CLEAR FUNCTIONS--------------------------------------------------------------
+function endReset(){
+  correct = 0;
+  incorrect = 0;
+  unanswered = 0;
+  currentQuestion = 0;
   $('.answers').html('');
   $('#answerstatus').html('Game Over');
   $('#stats').html("Correct: " + correct + " Incorrect: " +  incorrect + " Unanswered: " + unanswered);
   $('#replay').show();
-  resetStats();
 };
-
-//starts inserts first question, starts 30 sec timer, places click event on answers
-function run() {
+function clearStatus () {
+  $('#answerstatus').html('');
+  $('#correctanswer').html('');
   $('#stats').html('');
   $('#replay').hide();
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------GAMEPLAY FUNCTIONS-----------------------------------------------------------------
+//inserts first question, starts 30 sec timer, places click event on answers
+function run() {
+  clearStatus();
   thirtySec();
   displayQuestion();
   $('.correctAnswer, .answer1, .answer2, .answer3').on('click', userChoice);
 };
-
+//
 function userChoice(){
   if ($(this).hasClass('correctAnswer') && (currentQuestion < numOfQ)) { //if correct answer and not last question
     correct++;
     answerScreen();
-    displayStatus(questions[currentQuestion].correctAnswer, 'correct');
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'correct');
   }
   else if (currentQuestion < numOfQ) { // if incorrect and not last question
     incorrect++;
     answerScreen();
-    displayStatus(questions[currentQuestion].correctAnswer, 'Incorrect');
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'Incorrect');
   }
   else if ($(this).hasClass('correctAnswer') && (currentQuestion === numOfQ)) { //if correct and last question
     correct++;
     finalAnswer();
-    displayStatus(questions[currentQuestion].correctAnswer, 'correct');
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'correct');
   }
   else if (currentQuestion === numOfQ) { //if incorrect and last question
     incorrect++;
     finalAnswer();
-    displayStatus(questions[currentQuestion].correctAnswer, 'Incorrect');
+    displayStatus("Correct Answer: " + questions[currentQuestion].correctAnswer, 'Incorrect');
   }
 };
-
+//-------------------------------------------------------------------------------------------------------------------------------------------
 $('#start').on("click", run);
 $('#replay').on('click', run);
 });
