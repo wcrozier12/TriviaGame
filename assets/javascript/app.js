@@ -115,7 +115,7 @@ function thirtySec(){
 };
 //After the user guesses, starts 5 second timeout and then runs the next question
 function fiveSec(){
-  timeoutId = setTimeout(run, 5000);
+  timeoutId = setTimeout(run, 3000);
 };
 //When user runs out of time, correct answer appears, next question appears in five sec
 function decrement() {
@@ -168,7 +168,7 @@ function finalAnswer() {
   hideTime();
   timeoutId = setTimeout(finalScreen(), 5000);
 }
-//final screen with stats for the game and replay button
+//final/replay screen with stats for the game
 function finalScreen() {
   clearInterval(intervalId);
   hideTime();
@@ -177,14 +177,14 @@ function finalScreen() {
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------RESET/CLEAR FUNCTIONS--------------------------------------------------------------
 function endReset(){
-  correct = 0;
-  incorrect = 0;
-  unanswered = 0;
-  currentQuestion = 0;
   $('.answers').html('');
   $('#answerstatus').html('Game Over');
   $('#stats').html("Correct: " + correct + " Incorrect: " +  incorrect + " Unanswered: " + unanswered);
   $('#replay').show();
+  correct = 0;
+  incorrect = 0;
+  unanswered = 0;
+  currentQuestion = 0;
 };
 function clearStatus () {
   $('#answerstatus').html('');
@@ -194,7 +194,7 @@ function clearStatus () {
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------GAMEPLAY FUNCTIONS-----------------------------------------------------------------
-//inserts first question, starts 30 sec timer, places click event on answers
+//inserts question, starts 30 sec timer, places click event on answers
 function run() {
   clearStatus();
   thirtySec();
